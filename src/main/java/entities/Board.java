@@ -75,7 +75,9 @@ public class Board {
     public Collection<Piece> getBlackPieces() {
         return this.blackPieces;
     }
-
+    public Square getSquare(final int squareCoordinate) {
+        return this.gameBoard.get(squareCoordinate);
+    }
     public Collection<Piece> getWhitePieces() {
         return this.whitePieces;
     }

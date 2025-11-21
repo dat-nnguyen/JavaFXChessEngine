@@ -72,7 +72,7 @@ public abstract class Move {
             //  Move the piece to the new location
             builder.setPiece(this.movedPiece.movePiece(this));
 
-            // 4. Switch the turn
+            // Switch the turn
             builder.setNextMoveMaker(this.board.getCurrentPlayer().getOpponent().getAlliance());
 
             return builder.build();
