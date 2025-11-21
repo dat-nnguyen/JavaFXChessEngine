@@ -6,7 +6,6 @@ import entities.Board.Builder;
 
 public abstract class Move {
 
-    // 'protected' allows the subclasses (MajorMove/AttackMove) to see these fields directly.
     protected final Board board;
     protected final Piece movedPiece;
     protected final int destinationCoordinate;
