@@ -12,6 +12,9 @@ public class Board {
     private final Collection<Piece> whitePieces;
     private final Collection<Piece> blackPieces;
 
+    // stored as Pawn (specific) not Piece (generic)
+    private final Pawn enPassantPawn;
+
     private final WhitePlayer whitePlayer;
     private final BlackPlayer blackPlayer;
     private final Player currentPlayer;
@@ -19,9 +22,13 @@ public class Board {
     private Board(final Builder builder) {
         this.gameBoard = createGameBoard(builder);
 
+        // Assign the En Passant pawn (nullable)
+        this.enPassantPawn = builder.enPassantPawn;
+
         this.whitePieces = calculateActivePieces(this.gameBoard, Alliance.WHITE);
         this.blackPieces = calculateActivePieces(this.gameBoard, Alliance.BLACK);
 
+        // Call the REAL calculation method
         final Collection<Move> whiteStandardLegalMoves = calculateLegalMoves(this.whitePieces);
         final Collection<Move> blackStandardLegalMoves = calculateLegalMoves(this.blackPieces);
 
@@ -58,7 +65,6 @@ public class Board {
                                                            final Alliance alliance) {
         final List<Piece> activePieces = new ArrayList<>();
         for (final Square square : gameBoard) {
-            // FIXED: changed 'squares' to 'square'
             if (square.isOccupied()) {
                 final Piece piece = square.getPiece();
                 if (piece.getPieceAlliance() == alliance) {
@@ -69,9 +75,15 @@ public class Board {
         return activePieces;
     }
 
+    // --- THE FIXED METHOD ---
     private Collection<Move> calculateLegalMoves(final Collection<Piece> pieces) {
-        // Later we will loop through pieces and call piece.calculateLegalMoves(this)
-        return Collections.emptyList();
+        final List<Move> legalMoves = new ArrayList<>();
+
+        for (final Piece piece : pieces) {
+            // We verify the piece calculation logic (Knight, Rook, etc.) here
+            legalMoves.addAll(piece.calculateLegalMoves(this));
+        }
+        return legalMoves;
     }
 
     // --GETTERS--
@@ -84,15 +96,15 @@ public class Board {
     public Collection<Piece> getWhitePieces() {
         return this.whitePieces;
     }
-
+    public Pawn getEnPassantPawn() {
+        return this.enPassantPawn;
+    }
     public Player getCurrentPlayer() {
         return this.currentPlayer;
     }
-
     public BlackPlayer getBlackPlayer() {
         return this.blackPlayer;
     }
-
     public WhitePlayer getWhitePlayer() {
         return this.whitePlayer;
     }
@@ -102,8 +114,8 @@ public class Board {
 
         Map<Integer, Piece> boardConfig;
         Alliance nextMoveMaker;
-        // We will need to import Pawn here or use Piece
-        Piece enPassantPawn;
+        // FIXED: Change type to Pawn
+        Pawn enPassantPawn;
 
         public Builder() {
             this.boardConfig = new HashMap<>();
@@ -117,6 +129,11 @@ public class Board {
         public Builder setNextMoveMaker(final Alliance nextMoveMaker) {
             this.nextMoveMaker = nextMoveMaker;
             return this;
+        }
+
+        // FIXED: Accept Pawn directly to match Board field
+        public void setEnPassantPawn(Pawn enPassantPawn) {
+            this.enPassantPawn = enPassantPawn;
         }
 
         public Board build() {

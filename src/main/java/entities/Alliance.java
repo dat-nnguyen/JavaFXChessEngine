@@ -3,6 +3,7 @@ package entities;
 import Players.BlackPlayer;
 import Players.Player;
 import Players.WhitePlayer;
+import utils.BoardUtils;
 
 public enum Alliance {
     WHITE {
@@ -25,6 +26,14 @@ public enum Alliance {
                                    final BlackPlayer blackPlayer) {
             return whitePlayer;
         }
+        @Override
+        public boolean isPawnPromotionSquare(int position) {
+            return BoardUtils.EIGHTH_RANK[position];
+        }
+        @Override
+        public int getOppositeDirection() {
+            return 1;
+        }
     },
     BLACK {
         @Override
@@ -44,12 +53,21 @@ public enum Alliance {
                                    final BlackPlayer blackPlayer) {
             return blackPlayer;
         }
+        @Override
+        public boolean isPawnPromotionSquare(int position) {
+            return BoardUtils.FIRST_RANK[position];
+        }
+        @Override
+        public int getOppositeDirection() {
+            return -1;
+        }
     };
 
     // Every alliance must tell their direction
     public abstract int getDirection();
     public abstract boolean isWhite();
     public abstract boolean isBlack();
-
+    public abstract boolean isPawnPromotionSquare(int position);
+    public abstract int getOppositeDirection();
     public abstract Player choosePlayer(WhitePlayer whitePlayer, BlackPlayer blackPlayer);
 }
