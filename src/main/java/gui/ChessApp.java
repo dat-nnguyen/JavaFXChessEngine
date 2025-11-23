@@ -1,5 +1,7 @@
 package gui;
 
+import core.GameConfiguration;
+import core.GameEngine;
 import core.GameSetup;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -35,7 +37,13 @@ public class ChessApp extends Application {
         primaryStage.centerOnScreen();
     }
 
-    // ... showGameEngine() will go here later ...
+    public static void showGameEngine(GameConfiguration config) {
+        GameEngine engine = new GameEngine(config);
+        // Use a larger scene for the board (800x800)
+        Scene scene = new Scene(engine.getLayout(), 800, 800);
+        primaryStage.setScene(scene);
+        primaryStage.centerOnScreen();
+    }
 
     public static void main(String[] args) {
         launch(args);

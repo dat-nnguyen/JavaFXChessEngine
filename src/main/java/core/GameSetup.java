@@ -1,9 +1,11 @@
 package core;
 
+import core.GameConfiguration;
+import entities.Alliance;
 import gui.ChessApp;
 import javafx.animation.FadeTransition;
-import javafx.geometry.Pos;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -30,9 +32,9 @@ public class GameSetup {
 
     public GameSetup() {
         this.rootPane = new StackPane();
-
         this.rootPane.setStyle("-fx-background-color: black;");
 
+        // 1. Video Background
         addBackground("/assets/background.mp4");
 
         this.pixelFont = loadCustomFont("/assets/alagard.ttf", 20);
@@ -49,12 +51,11 @@ public class GameSetup {
                         "-fx-border-radius: 10;"
         );
 
-        // --- TITLE ---
         Label header = new Label("GAME CONFIGURATION");
         header.setFont(loadCustomFont("/assets/alagard.ttf", 36));
         header.setStyle("-fx-text-fill: #e67e22; -fx-effect: dropshadow(gaussian, black, 3, 1.0, 0, 0);");
 
-        // --- SECTION 1: MODE ---
+        // --- MODE ---
         Label modeLabel = createHeaderLabel("Select Mode");
         RadioButton pvpBtn = createPixelRadioButton("Player vs Player");
         pvpBtn.setSelected(true);
@@ -64,14 +65,14 @@ public class GameSetup {
         pvpBtn.setToggleGroup(modeGroup);
         aiBtn.setToggleGroup(modeGroup);
 
-        // --- SECTION 2: DIFFICULTY ---
+        // --- DIFFICULTY ---
         difficultyBox = new VBox(10);
         difficultyBox.setAlignment(Pos.CENTER);
         difficultyBox.setStyle("-fx-background-color: rgba(255, 255, 255, 0.05); -fx-padding: 10; -fx-background-radius: 5;");
 
         Label diffLabel = new Label("AI Difficulty");
         diffLabel.setFont(loadCustomFont("/assets/alagard.ttf", 22));
-        diffLabel.setStyle("-fx-text-fill: #f1c40f;"); // Gold text
+        diffLabel.setStyle("-fx-text-fill: #f1c40f;");
 
         RadioButton easyBtn = createPixelRadioButton("Easy");
         RadioButton medBtn = createPixelRadioButton("Medium");
@@ -93,7 +94,7 @@ public class GameSetup {
             difficultyBox.setManaged(isAI);
         });
 
-        // --- SECTION 3: TIME & COLOR ---
+        // --- TIME & COLOR ---
         Label timeLabel = createHeaderLabel("Time per Player (Minutes)");
         timeDropdown = new ComboBox<>();
         timeDropdown.getItems().addAll(10, 20, 30);
@@ -116,9 +117,36 @@ public class GameSetup {
 
         // --- BUTTONS ---
         Button startBtn = createImageButton("/assets/start.png");
+
+        // --- CRITICAL FIX: Restored the Launch Logic ---
         startBtn.setOnAction(e -> {
-            System.out.println("Start Game Clicked!");
-            // TODO: Collect data and launch ChessApp.showGameEngine(config);
+            // 1. Get Mode
+            RadioButton selectedMode = (RadioButton) modeGroup.getSelectedToggle();
+            boolean isAI = selectedMode.getText().contains("AI");
+            GameConfiguration.GameMode mode = isAI ? GameConfiguration.GameMode.HUMAN_VS_AI : GameConfiguration.GameMode.HUMAN_VS_HUMAN;
+
+            // 2. Get Difficulty
+            GameConfiguration.Difficulty diff = null;
+            if (isAI) {
+                RadioButton selectedDiff = (RadioButton) difficultyGroup.getSelectedToggle();
+                String t = selectedDiff.getText();
+                if (t.equals("Easy")) diff = GameConfiguration.Difficulty.EASY;
+                else if (t.equals("Medium")) diff = GameConfiguration.Difficulty.MEDIUM;
+                else diff = GameConfiguration.Difficulty.HARD;
+            }
+
+            // 3. Get Time & Color
+            int time = timeDropdown.getValue();
+
+            RadioButton selectedColor = (RadioButton) colorGroup.getSelectedToggle();
+            String cText = selectedColor.getText();
+            Alliance alliance = null;
+            if (cText.equals("White")) alliance = Alliance.WHITE;
+            else if (cText.equals("Black")) alliance = Alliance.BLACK;
+
+            // 4. Launch
+            GameConfiguration config = new GameConfiguration(mode, diff, time, alliance);
+            ChessApp.showGameEngine(config);
         });
 
         Button backBtn = createImageButton("/assets/back.png");
@@ -128,37 +156,21 @@ public class GameSetup {
         buttonBox.setAlignment(Pos.CENTER);
         buttonBox.setPadding(new Insets(20, 0, 0, 0));
 
-        // Add to Panel
-        optionPanel.getChildren().addAll(
-                header,
-                new Separator(),
-                modeLabel, pvpBtn, aiBtn,
-                difficultyBox,
-                timeLabel, timeDropdown,
-                colorLabel, colorBox,
-                new Separator(),
-                buttonBox
-        );
-
+        optionPanel.getChildren().addAll(header, new Separator(), modeLabel, pvpBtn, aiBtn, difficultyBox, timeLabel, timeDropdown, colorLabel, colorBox, new Separator(), buttonBox);
         rootPane.getChildren().add(optionPanel);
     }
 
-    public StackPane getLayout() {
-        return this.rootPane;
-    }
+    public StackPane getLayout() { return this.rootPane; }
 
-    // --- HELPERS ---
-
+    // --- HELPERS (Same as before) ---
     private void addBackground(String videoPath) {
         try {
-            // 1. Load Video
             String mediaUrl = getClass().getResource(videoPath).toExternalForm();
             Media media = new Media(mediaUrl);
             MediaPlayer player = new MediaPlayer(media);
             player.setCycleCount(MediaPlayer.INDEFINITE);
             player.setAutoPlay(true);
             player.setMute(true);
-
             MediaView mediaView = new MediaView(player);
             mediaView.fitWidthProperty().bind(this.rootPane.widthProperty());
             mediaView.fitHeightProperty().bind(this.rootPane.heightProperty());
@@ -173,7 +185,6 @@ public class GameSetup {
             this.rootPane.getChildren().add(0, mediaView);
             this.rootPane.getChildren().add(1, placeholder);
 
-            // 3. Fade out curtain when video plays
             player.setOnPlaying(() -> {
                 FadeTransition fade = new FadeTransition(Duration.millis(500), placeholder);
                 fade.setFromValue(1.0);
@@ -181,52 +192,24 @@ public class GameSetup {
                 fade.setOnFinished(e -> this.rootPane.getChildren().remove(placeholder));
                 fade.play();
             });
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            this.rootPane.setStyle("-fx-background-color: #2b2b2b;");
-        }
+        } catch (Exception e) { e.printStackTrace(); this.rootPane.setStyle("-fx-background-color: #2b2b2b;"); }
     }
 
-    private Button createImageButton(String imagePath) {
+    private Button createImageButton(String path) {
         Button btn = new Button();
-        InputStream imageStream = getClass().getResourceAsStream(imagePath);
-        if (imageStream != null) {
-            Image img = new Image(imageStream);
-            ImageView view = new ImageView(img);
-            view.setFitWidth(160);
-            view.setPreserveRatio(true);
-            btn.setGraphic(view);
+        InputStream is = getClass().getResourceAsStream(path);
+        if (is != null) {
+            ImageView v = new ImageView(new Image(is));
+            v.setFitWidth(160); v.setPreserveRatio(true);
+            btn.setGraphic(v);
             btn.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
-
             btn.setOnMouseEntered(e -> btn.setScaleX(1.1));
-            btn.setOnMouseEntered(e -> { btn.setScaleX(1.1); btn.setScaleY(1.1); });
-            btn.setOnMouseExited(e -> { btn.setScaleX(1.0); btn.setScaleY(1.0); });
-        } else {
-            btn.setText("IMG MISSING");
-        }
+            btn.setOnMouseExited(e -> btn.setScaleX(1.0));
+        } else btn.setText("MISSING");
         return btn;
     }
 
-    private Label createHeaderLabel(String text) {
-        Label l = new Label(text);
-        l.setFont(this.pixelFont);
-        l.setStyle("-fx-text-fill: #b2bec3; -fx-underline: true;");
-        return l;
-    }
-
-    private RadioButton createPixelRadioButton(String text) {
-        RadioButton rb = new RadioButton(text);
-        rb.setFont(this.pixelFont);
-        rb.setStyle("-fx-text-fill: #f0e6d2; -fx-cursor: hand;");
-        return rb;
-    }
-
-    private Font loadCustomFont(String path, double size) {
-        try {
-            InputStream fontStream = getClass().getResourceAsStream(path);
-            if (fontStream != null) return Font.loadFont(fontStream, size);
-        } catch (Exception e) { e.printStackTrace(); }
-        return new Font("Arial", size);
-    }
+    private Label createHeaderLabel(String t) { Label l = new Label(t); l.setFont(this.pixelFont); l.setStyle("-fx-text-fill: #b2bec3; -fx-underline: true;"); return l; }
+    private RadioButton createPixelRadioButton(String t) { RadioButton r = new RadioButton(t); r.setFont(this.pixelFont); r.setStyle("-fx-text-fill: #f0e6d2; -fx-cursor: hand;"); return r; }
+    private Font loadCustomFont(String p, double s) { try { InputStream is = getClass().getResourceAsStream(p); if (is != null) return Font.loadFont(is, s); } catch (Exception e) {} return new Font("Arial", s); }
 }

@@ -40,7 +40,7 @@ public abstract class Square {
 
         @Override
         public String toString() {
-            return "-"; // Representation for console print
+            return "-";
         }
         @Override
         public boolean isOccupied() {
@@ -78,5 +78,8 @@ public abstract class Square {
         public Piece getPiece() {
             return this.pieceOnSquare;
         }
+    }
+    public int getSquareCoordinate() {
+        return this.squareCoordinate;
     }
 }

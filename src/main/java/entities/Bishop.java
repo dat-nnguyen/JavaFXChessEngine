@@ -73,11 +73,13 @@ public class Bishop extends Piece {
         return PieceType.BISHOP.toString();
     }
     //--HELPER METHODS--
-    private static boolean isFirstColumnExclusion(final int currentPosition, final int candidateOffset){
-        // if on first column, we can't go further
-        return BoardUtils.FIRST_COLUMN[currentPosition] && (candidateOffset == -9);
+    private static boolean isFirstColumnExclusion(final int currentPosition, final int candidateOffset) {
+        // Logic: If on the Left Edge (Col 1), we cannot move Left-Up (-9) or Left-Down (+7)
+        return BoardUtils.FIRST_COLUMN[currentPosition] && (candidateOffset == -9 || candidateOffset == 7);
     }
-    private static boolean isEighthColumnExclusion(final int currentPosition, final int candidateOffset){
-        return BoardUtils.EIGHTH_COLUMN[currentPosition] && (candidateOffset == -7);
+
+    private static boolean isEighthColumnExclusion(final int currentPosition, final int candidateOffset) {
+        // Logic: If on the Right Edge (Col 8), we cannot move Right-Up (-7) or Right-Down (+9)
+        return BoardUtils.EIGHTH_COLUMN[currentPosition] && (candidateOffset == -7 || candidateOffset == 9);
     }
 }
