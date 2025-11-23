@@ -3,6 +3,7 @@ package core;
 import core.GameConfiguration;
 import entities.Alliance;
 import gui.ChessApp;
+import gui.SoundManager;
 import javafx.animation.FadeTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -34,7 +35,6 @@ public class GameSetup {
         this.rootPane = new StackPane();
         this.rootPane.setStyle("-fx-background-color: black;");
 
-        // 1. Video Background
         addBackground("/assets/background.mp4");
 
         this.pixelFont = loadCustomFont("/assets/alagard.ttf", 20);
@@ -118,14 +118,12 @@ public class GameSetup {
         // --- BUTTONS ---
         Button startBtn = createImageButton("/assets/start.png");
 
-        // --- CRITICAL FIX: Restored the Launch Logic ---
         startBtn.setOnAction(e -> {
-            // 1. Get Mode
+            SoundManager.playClick();
             RadioButton selectedMode = (RadioButton) modeGroup.getSelectedToggle();
             boolean isAI = selectedMode.getText().contains("AI");
             GameConfiguration.GameMode mode = isAI ? GameConfiguration.GameMode.HUMAN_VS_AI : GameConfiguration.GameMode.HUMAN_VS_HUMAN;
 
-            // 2. Get Difficulty
             GameConfiguration.Difficulty diff = null;
             if (isAI) {
                 RadioButton selectedDiff = (RadioButton) difficultyGroup.getSelectedToggle();
@@ -135,7 +133,6 @@ public class GameSetup {
                 else diff = GameConfiguration.Difficulty.HARD;
             }
 
-            // 3. Get Time & Color
             int time = timeDropdown.getValue();
 
             RadioButton selectedColor = (RadioButton) colorGroup.getSelectedToggle();
@@ -144,13 +141,17 @@ public class GameSetup {
             if (cText.equals("White")) alliance = Alliance.WHITE;
             else if (cText.equals("Black")) alliance = Alliance.BLACK;
 
-            // 4. Launch
+            SoundManager.stopMusic();
+
             GameConfiguration config = new GameConfiguration(mode, diff, time, alliance);
             ChessApp.showGameEngine(config);
         });
 
         Button backBtn = createImageButton("/assets/back.png");
-        backBtn.setOnAction(e -> ChessApp.showMainMenu());
+        backBtn.setOnAction(e -> {
+            SoundManager.playClick();
+            ChessApp.showMainMenu();
+        });
 
         HBox buttonBox = new HBox(30, backBtn, startBtn);
         buttonBox.setAlignment(Pos.CENTER);
@@ -162,7 +163,7 @@ public class GameSetup {
 
     public StackPane getLayout() { return this.rootPane; }
 
-    // --- HELPERS (Same as before) ---
+    // --- HELPERS
     private void addBackground(String videoPath) {
         try {
             String mediaUrl = getClass().getResource(videoPath).toExternalForm();

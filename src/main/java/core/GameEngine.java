@@ -8,6 +8,7 @@ import entities.MoveTransition;
 import entities.Piece;
 import entities.Square;
 import gui.ChessApp;
+import gui.SoundManager;
 import gui.TimerPanel;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -62,6 +63,7 @@ public class GameEngine {
 
         Button menuBtn = createImageButton("/assets/pause.png", 100);
         menuBtn.setOnAction(e -> {
+            SoundManager.playClick();
             gameTimer.pause();
             pauseMenu.setVisible(true);
             confirmationOverlay.setVisible(false);
@@ -94,12 +96,14 @@ public class GameEngine {
 
         Button continueBtn = createImageButton("/assets/continue.png", 200);
         continueBtn.setOnAction(e -> {
+            SoundManager.playClick();
             this.pauseMenu.setVisible(false);
             gameTimer.resume();
         });
 
         Button exitBtn = createImageButton("/assets/exitmatch.png", 200);
         exitBtn.setOnAction(e -> {
+            SoundManager.playClick();
             this.pauseMenu.setVisible(false);
             this.confirmationOverlay.setVisible(true);
         });
@@ -127,10 +131,14 @@ public class GameEngine {
         buttons.setAlignment(Pos.CENTER);
 
         Button yesBtn = createImageButton("/assets/yes.png", 100);
-        yesBtn.setOnAction(e -> ChessApp.showMainMenu());
+        yesBtn.setOnAction(e -> {
+            SoundManager.playClick();
+            ChessApp.showMainMenu();
+        });
 
         Button noBtn = createImageButton("/assets/no.png", 100);
         noBtn.setOnAction(e -> {
+            SoundManager.playClick();
             this.confirmationOverlay.setVisible(false);
             gameTimer.resume();
         });

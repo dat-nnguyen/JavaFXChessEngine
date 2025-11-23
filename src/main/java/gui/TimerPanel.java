@@ -24,7 +24,7 @@ public class TimerPanel extends HBox {
 
     public TimerPanel(int totalMinutes) {
         // Styling: Horizontal layout with spacing
-        this.setSpacing(50); // Space between the two clocks
+        this.setSpacing(50);
         this.setAlignment(Pos.CENTER);
         this.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5); -fx-padding: 15;");
 
@@ -47,8 +47,6 @@ public class TimerPanel extends HBox {
         this.timeline.setCycleCount(Timeline.INDEFINITE);
         this.timeline.play();
     }
-
-    // ... (The rest of the methods: tick, switchTurn, updateLabels, etc. remain exactly the same) ...
 
     private void tick() {
         if (isWhiteTurn) {

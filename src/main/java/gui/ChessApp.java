@@ -17,14 +17,13 @@ public class ChessApp extends Application {
         primaryStage.setTitle("JavaFX Chess");
 
         primaryStage.setResizable(false);
-
+        SoundManager.playMusic();
         showMainMenu();
         primaryStage.show();
     }
 
     public static void showMainMenu() {
         MainMenu menu = new MainMenu();
-        // Fixed size: 600 width, 600 height
         Scene scene = new Scene(menu.getLayout(), 900, 700);
         primaryStage.setScene(scene);
         primaryStage.centerOnScreen();
@@ -39,7 +38,6 @@ public class ChessApp extends Application {
 
     public static void showGameEngine(GameConfiguration config) {
         GameEngine engine = new GameEngine(config);
-        // Use a larger scene for the board (800x800)
         Scene scene = new Scene(engine.getLayout(), 800, 800);
         primaryStage.setScene(scene);
         primaryStage.centerOnScreen();

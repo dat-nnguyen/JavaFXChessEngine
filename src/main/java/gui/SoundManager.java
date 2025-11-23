@@ -10,20 +10,20 @@ public class SoundManager {
 
     private static MediaPlayer musicPlayer;
     private static AudioClip clickSound;
+
     static {
         try {
-            URL musicUrl = SoundManager.class.getResource("/assets/sounds/music.mp3");
+            URL musicUrl = SoundManager.class.getResource("/assets/music.mp3");
             if (musicUrl != null) {
                 Media media = new Media(musicUrl.toExternalForm());
                 musicPlayer = new MediaPlayer(media);
-                musicPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+                musicPlayer.setCycleCount(MediaPlayer.INDEFINITE); // Loop forever
                 musicPlayer.setVolume(0.5); // 50% volume
             } else {
                 System.out.println("Music file not found!");
             }
 
-            // 2. Load Click Sound
-            URL clickUrl = SoundManager.class.getResource("/assets/sounds/click.wav");
+            URL clickUrl = SoundManager.class.getResource("/assets/click.mp3");
             if (clickUrl != null) {
                 clickSound = new AudioClip(clickUrl.toExternalForm());
                 clickSound.setVolume(1.0);

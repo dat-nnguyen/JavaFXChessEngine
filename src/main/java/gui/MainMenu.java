@@ -37,10 +37,14 @@ public class MainMenu {
 
         Button playButton = createImageButton("/assets/play.png");
 
-        playButton.setOnAction(e -> ChessApp.showGameSetup());
+        playButton.setOnAction(e -> {
+            SoundManager.playClick();
+            ChessApp.showGameSetup();
+        });
 
         Button exitButton = createImageButton("/assets/exit.png");
         exitButton.setOnAction(e -> {
+            SoundManager.playClick();
             Platform.exit();
             System.exit(0);
         });

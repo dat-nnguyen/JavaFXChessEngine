@@ -15,9 +15,9 @@ public class GameConfiguration {
     }
 
     private final GameMode gameMode;
-    private final Difficulty aiDifficulty; // Can be null if mode is PvP
+    private final Difficulty aiDifficulty;
     private final int timeControlMinutes;
-    private final Alliance playerColor; // Can be null if Random
+    private final Alliance playerColor;
 
     public GameConfiguration(final GameMode gameMode,
                              final Difficulty aiDifficulty,
