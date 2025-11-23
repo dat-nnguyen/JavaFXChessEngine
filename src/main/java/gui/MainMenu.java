@@ -26,7 +26,7 @@ public class MainMenu {
         this.rootPane.setStyle("-fx-background-color: black;");
         addBackground("/assets/background.mp4");
 
-        this.pixelFont = loadCustomFont("/assets/alagard.ttf", 80);
+        this.pixelFont = loadCustomFont("/assets/Retro Gaming.ttf", 80);
 
         this.menuBox = new VBox(-50);
         this.menuBox.setAlignment(Pos.CENTER);

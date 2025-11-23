@@ -37,11 +37,11 @@ public class GameSetup {
 
         addBackground("/assets/background.mp4");
 
-        this.pixelFont = loadCustomFont("/assets/alagard.ttf", 20);
-        this.optionPanel = new VBox(15);
-        this.optionPanel.setMaxSize(500, 550);
+        this.pixelFont = loadCustomFont("/assets/Retro Gaming.ttf", 20);
+        this.optionPanel = new VBox(10); // Increased spacing
+        this.optionPanel.setMaxSize(550, 520); // Widen for title
         this.optionPanel.setAlignment(Pos.TOP_CENTER);
-        this.optionPanel.setPadding(new Insets(30));
+        this.optionPanel.setPadding(new Insets(40));
 
         this.optionPanel.setStyle(
                 "-fx-background-color: rgba(0, 0, 0, 0.85);" +
@@ -51,8 +51,9 @@ public class GameSetup {
                         "-fx-border-radius: 10;"
         );
 
+        // Title
         Label header = new Label("GAME CONFIGURATION");
-        header.setFont(loadCustomFont("/assets/alagard.ttf", 36));
+        header.setFont(loadCustomFont("/assets/Retro Gaming.ttf", 32));
         header.setStyle("-fx-text-fill: #e67e22; -fx-effect: dropshadow(gaussian, black, 3, 1.0, 0, 0);");
 
         // --- MODE ---
@@ -70,9 +71,10 @@ public class GameSetup {
         difficultyBox.setAlignment(Pos.CENTER);
         difficultyBox.setStyle("-fx-background-color: rgba(255, 255, 255, 0.05); -fx-padding: 10; -fx-background-radius: 5;");
 
+        // Fixed label font logic
         Label diffLabel = new Label("AI Difficulty");
-        diffLabel.setFont(loadCustomFont("/assets/alagard.ttf", 22));
-        diffLabel.setStyle("-fx-text-fill: #f1c40f;");
+        diffLabel.setFont(loadCustomFont("/assets/Retro Gaming.ttf", 22));
+        diffLabel.setStyle("-fx-text-fill: #f1c40f; -fx-effect: dropshadow(gaussian, black, 2, 1.0, 0, 0);");
 
         RadioButton easyBtn = createPixelRadioButton("Easy");
         RadioButton medBtn = createPixelRadioButton("Medium");
@@ -96,10 +98,16 @@ public class GameSetup {
 
         // --- TIME & COLOR ---
         Label timeLabel = createHeaderLabel("Time per Player (Minutes)");
+
+        // Setup Dropdown
         timeDropdown = new ComboBox<>();
         timeDropdown.getItems().addAll(10, 20, 30);
         timeDropdown.setValue(10);
-        timeDropdown.setStyle("-fx-font-family: 'Alagard'; -fx-font-size: 18px; -fx-background-color: #dcdcdc;");
+
+        loadCustomFont("/assets/Retro Gaming.ttf", 10);
+        timeDropdown.setStyle("-fx-font-family: 'Retro Gaming'; -fx-font-size: 18px; -fx-background-color: #dcdcdc;");
+
+        timeDropdown.setOnAction(e -> SoundManager.playClick());
 
         Label colorLabel = createHeaderLabel("Choose Side");
         RadioButton whiteBtn = createPixelRadioButton("White");
@@ -117,9 +125,9 @@ public class GameSetup {
 
         // --- BUTTONS ---
         Button startBtn = createImageButton("/assets/start.png");
-
         startBtn.setOnAction(e -> {
             SoundManager.playClick();
+
             RadioButton selectedMode = (RadioButton) modeGroup.getSelectedToggle();
             boolean isAI = selectedMode.getText().contains("AI");
             GameConfiguration.GameMode mode = isAI ? GameConfiguration.GameMode.HUMAN_VS_AI : GameConfiguration.GameMode.HUMAN_VS_HUMAN;
@@ -134,14 +142,13 @@ public class GameSetup {
             }
 
             int time = timeDropdown.getValue();
-
             RadioButton selectedColor = (RadioButton) colorGroup.getSelectedToggle();
             String cText = selectedColor.getText();
             Alliance alliance = null;
             if (cText.equals("White")) alliance = Alliance.WHITE;
             else if (cText.equals("Black")) alliance = Alliance.BLACK;
 
-            SoundManager.stopMusic();
+            // REMOVE STOP MUSIC HERE (So music continues)
 
             GameConfiguration config = new GameConfiguration(mode, diff, time, alliance);
             ChessApp.showGameEngine(config);
@@ -163,7 +170,26 @@ public class GameSetup {
 
     public StackPane getLayout() { return this.rootPane; }
 
-    // --- HELPERS
+    // --- HELPERS ---
+
+    private Label createHeaderLabel(String text) {
+        Label l = new Label(text);
+        l.setFont(loadCustomFont("/assets/Retro Gaming.ttf", 24));
+        l.setStyle("-fx-text-fill: #e67e22; -fx-effect: dropshadow(gaussian, black, 2, 1.0, 0, 0);");
+        return l;
+    }
+
+    private RadioButton createPixelRadioButton(String text) {
+        RadioButton rb = new RadioButton(text);
+
+        rb.setFont(loadCustomFont("/assets/Retro Gaming.ttf", 18));
+        rb.setStyle("-fx-text-fill: #f0e6d2; -fx-cursor: hand;");
+
+        rb.setOnMouseClicked(e -> SoundManager.playClick());
+
+        return rb;
+    }
+
     private void addBackground(String videoPath) {
         try {
             String mediaUrl = getClass().getResource(videoPath).toExternalForm();
@@ -210,7 +236,11 @@ public class GameSetup {
         return btn;
     }
 
-    private Label createHeaderLabel(String t) { Label l = new Label(t); l.setFont(this.pixelFont); l.setStyle("-fx-text-fill: #b2bec3; -fx-underline: true;"); return l; }
-    private RadioButton createPixelRadioButton(String t) { RadioButton r = new RadioButton(t); r.setFont(this.pixelFont); r.setStyle("-fx-text-fill: #f0e6d2; -fx-cursor: hand;"); return r; }
-    private Font loadCustomFont(String p, double s) { try { InputStream is = getClass().getResourceAsStream(p); if (is != null) return Font.loadFont(is, s); } catch (Exception e) {} return new Font("Arial", s); }
+    private Font loadCustomFont(String path, double size) {
+        try {
+            InputStream is = getClass().getResourceAsStream(path);
+            if (is != null) return Font.loadFont(is, size);
+        } catch (Exception e) {}
+        return new Font("Arial", size);
+    }
 }

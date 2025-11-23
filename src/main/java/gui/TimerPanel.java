@@ -95,7 +95,7 @@ public class TimerPanel extends HBox {
 
     private Font loadFont() {
         try {
-            InputStream is = getClass().getResourceAsStream("/assets/alagard.ttf");
+            InputStream is = getClass().getResourceAsStream("/assets/Retro Gaming.ttf");
             if (is != null) return Font.loadFont(is, 30);
         } catch (Exception e) { }
         return new Font("Arial", 30);

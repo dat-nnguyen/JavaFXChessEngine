@@ -13,7 +13,7 @@ public class SoundManager {
 
     static {
         try {
-            URL musicUrl = SoundManager.class.getResource("/assets/music.mp3");
+            URL musicUrl = SoundManager.class.getResource("/assets/music.wav");
             if (musicUrl != null) {
                 Media media = new Media(musicUrl.toExternalForm());
                 musicPlayer = new MediaPlayer(media);
@@ -23,10 +23,11 @@ public class SoundManager {
                 System.out.println("Music file not found!");
             }
 
-            URL clickUrl = SoundManager.class.getResource("/assets/click.mp3");
+            URL clickUrl = SoundManager.class.getResource("/assets/click.wav");
             if (clickUrl != null) {
                 clickSound = new AudioClip(clickUrl.toExternalForm());
                 clickSound.setVolume(1.0);
+                clickSound.play(0.0);
             } else {
                 System.out.println("Click sound not found!");
             }
@@ -35,7 +36,11 @@ public class SoundManager {
             e.printStackTrace();
         }
     }
-
+    public static void setMusicMuted(boolean muted) {
+        if (musicPlayer != null) {
+            musicPlayer.setMute(muted);
+        }
+    }
     public static void playMusic() {
         if (musicPlayer != null) {
             musicPlayer.play();

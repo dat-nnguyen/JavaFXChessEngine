@@ -38,7 +38,8 @@ public class ChessApp extends Application {
 
     public static void showGameEngine(GameConfiguration config) {
         GameEngine engine = new GameEngine(config);
-        Scene scene = new Scene(engine.getLayout(), 800, 800);
+
+        Scene scene = new Scene(engine.getLayout(), 900l, 700);
         primaryStage.setScene(scene);
         primaryStage.centerOnScreen();
     }

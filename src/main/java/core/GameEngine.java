@@ -1,12 +1,12 @@
 package core;
 
-import core.BoardPanel;
 import core.GameConfiguration;
 import entities.Board;
 import core.Move;
 import entities.MoveTransition;
 import entities.Piece;
 import entities.Square;
+import gui.BoardPanel;
 import gui.ChessApp;
 import gui.SoundManager;
 import gui.TimerPanel;
@@ -17,7 +17,12 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 import javafx.scene.text.Font;
+import javafx.util.Duration;
+import javafx.animation.FadeTransition;
 
 import java.io.InputStream;
 import java.util.Collection;
@@ -33,34 +38,34 @@ public class GameEngine {
 
     private VBox pauseMenu;
     private VBox confirmationOverlay;
-    private Font pixelFont;
 
     private Square sourceSquare;
     private Square destinationSquare;
     private Piece humanMovedPiece;
-
-    private GameConfiguration config;
+    private boolean isMusicMuted = false;
 
     public GameEngine(GameConfiguration config) {
-        this.config = config;
         this.chessBoard = Board.createStandardBoard();
-
-        // Load Font
-        this.pixelFont = loadCustomFont("/assets/alagard.ttf", 20);
 
         this.gameTimer = new TimerPanel(config.getTimeControlMinutes());
         this.boardPanel = new BoardPanel(this, config);
 
         this.rootLayer = new StackPane();
-        addBackground("/assets/playing.png");
+        this.rootLayer.setStyle("-fx-background-color: black;");
+        addBackground("/assets/background.mp4");
 
         this.uiLayer = new BorderPane();
         this.uiLayer.setCenter(this.boardPanel);
+
+        BorderPane.setMargin(this.boardPanel, new Insets(25, 0, 0, 0));
+
         this.uiLayer.setBottom(this.gameTimer);
 
+        // --- CREATE MENUS ---
         createPauseMenu();
         createConfirmationOverlay();
 
+        // --- MENU BUTTON (Top Left) ---
         Button menuBtn = createImageButton("/assets/pause.png", 100);
         menuBtn.setOnAction(e -> {
             SoundManager.playClick();
@@ -68,40 +73,77 @@ public class GameEngine {
             pauseMenu.setVisible(true);
             confirmationOverlay.setVisible(false);
         });
-
         StackPane.setAlignment(menuBtn, Pos.TOP_LEFT);
         StackPane.setMargin(menuBtn, new Insets(15));
 
-        this.rootLayer.getChildren().addAll(this.uiLayer, menuBtn, pauseMenu, confirmationOverlay);
+        // --- SOUND BUTTON (Bottom Left) ---
+        Button soundBtn = new Button();
+        ImageView soundOnIcon = loadIcon("/assets/unmute.png", 70);
+        ImageView soundOffIcon = loadIcon("/assets/mute.png", 70);
+
+        soundBtn.setGraphic(soundOnIcon);
+        soundBtn.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
+
+        soundBtn.setOnAction(e -> {
+            SoundManager.playClick();
+            isMusicMuted = !isMusicMuted;
+            if (isMusicMuted) {
+                SoundManager.setMusicMuted(true);
+                soundBtn.setGraphic(soundOffIcon);
+            } else {
+                SoundManager.setMusicMuted(false);
+                soundBtn.setGraphic(soundOnIcon);
+            }
+        });
+
+        // Hover Effect
+        soundBtn.setOnMouseEntered(e -> soundBtn.setScaleX(1.1));
+        soundBtn.setOnMouseEntered(e -> { soundBtn.setScaleX(1.1); soundBtn.setScaleY(1.1); });
+        soundBtn.setOnMouseExited(e -> { soundBtn.setScaleX(1.0); soundBtn.setScaleY(1.0); });
+
+        StackPane.setAlignment(soundBtn, Pos.BOTTOM_LEFT);
+        StackPane.setMargin(soundBtn, new Insets(15));
+
+        this.rootLayer.getChildren().addAll(this.uiLayer, menuBtn, soundBtn, pauseMenu, confirmationOverlay);
 
         this.boardPanel.drawBoard(this.chessBoard);
     }
 
     public StackPane getLayout() { return this.rootLayer; }
 
+    // --- UTILS ---
+
+    private ImageView loadIcon(String path, double size) {
+        try {
+            InputStream is = getClass().getResourceAsStream(path);
+            if (is != null) {
+                ImageView v = new ImageView(new Image(is));
+                v.setFitWidth(size);
+                v.setPreserveRatio(true);
+                return v;
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return new ImageView();
+    }
+
     private void createPauseMenu() {
         this.pauseMenu = new VBox(15);
         this.pauseMenu.setAlignment(Pos.CENTER);
         this.pauseMenu.setMaxSize(350, 300);
-
-        this.pauseMenu.setStyle(
-                "-fx-background-color: rgba(0, 0, 0, 0.9);" +
-                        "-fx-border-color: #8f563b; -fx-border-width: 4px;" +
-                        "-fx-background-radius: 10; -fx-border-radius: 10;"
-        );
+        this.pauseMenu.setStyle("-fx-background-color: rgba(0, 0, 0, 0.9); -fx-border-color: #8f563b; -fx-border-width: 4px; -fx-background-radius: 10; -fx-border-radius: 10;");
 
         Label title = new Label("GAME PAUSED");
-        title.setFont(loadCustomFont("/assets/alagard.ttf", 32));
+        title.setFont(loadCustomFont("/assets/Retro Gaming.ttf", 32));
         title.setStyle("-fx-text-fill: #e67e22; -fx-effect: dropshadow(gaussian, black, 3, 1.0, 0, 0);");
 
-        Button continueBtn = createImageButton("/assets/continue.png", 200);
+        Button continueBtn = createImageButton("/assets/continue.png", 180);
         continueBtn.setOnAction(e -> {
             SoundManager.playClick();
             this.pauseMenu.setVisible(false);
             gameTimer.resume();
         });
 
-        Button exitBtn = createImageButton("/assets/exitmatch.png", 200);
+        Button exitBtn = createImageButton("/assets/exitmatch.png", 180);
         exitBtn.setOnAction(e -> {
             SoundManager.playClick();
             this.pauseMenu.setVisible(false);
@@ -116,15 +158,10 @@ public class GameEngine {
         this.confirmationOverlay = new VBox(20);
         this.confirmationOverlay.setAlignment(Pos.CENTER);
         this.confirmationOverlay.setMaxSize(400, 250);
-        this.confirmationOverlay.setStyle(
-                "-fx-background-color: rgba(50, 0, 0, 0.95);" +
-                        "-fx-border-color: #c0392b; -fx-border-width: 4px;" +
-                        "-fx-background-radius: 10;"
-        );
+        this.confirmationOverlay.setStyle("-fx-background-color: rgba(50, 0, 0, 0.95); -fx-border-color: #c0392b; -fx-border-width: 4px; -fx-background-radius: 10;");
 
-        // Use Pixel Font
         Label warning = new Label("You will lose the match.\nAre you sure?");
-        warning.setFont(loadCustomFont("/assets/alagard.ttf", 24));
+        warning.setFont(loadCustomFont("/assets/Retro Gaming.ttf", 24));
         warning.setStyle("-fx-text-fill: #ecf0f1; -fx-text-alignment: center;");
 
         HBox buttons = new HBox(20);
@@ -133,6 +170,7 @@ public class GameEngine {
         Button yesBtn = createImageButton("/assets/yes.png", 100);
         yesBtn.setOnAction(e -> {
             SoundManager.playClick();
+            SoundManager.playMusic();
             ChessApp.showMainMenu();
         });
 
@@ -148,7 +186,6 @@ public class GameEngine {
         this.confirmationOverlay.setVisible(false);
     }
 
-    // --- UTILS ---
     private Button createImageButton(String path, double width) {
         Button btn = new Button();
         InputStream is = getClass().getResourceAsStream(path);
@@ -171,26 +208,32 @@ public class GameEngine {
         return new Font("Arial", size);
     }
 
-    private void addBackground(String imagePath) {
+    private void addBackground(String videoPath) {
         try {
-            InputStream is = getClass().getResourceAsStream(imagePath);
-            if (is != null) {
-                ImageView bg = new ImageView(new Image(is));
-                bg.fitWidthProperty().bind(rootLayer.widthProperty());
-                bg.fitHeightProperty().bind(rootLayer.heightProperty());
-                bg.setPreserveRatio(false);
-                this.rootLayer.getChildren().add(0, bg);
-            }
-        } catch (Exception e) {
-            this.rootLayer.setStyle("-fx-background-color: #202020;");
-        }
+            String mediaUrl = getClass().getResource(videoPath).toExternalForm();
+            Media media = new Media(mediaUrl);
+            MediaPlayer player = new MediaPlayer(media);
+            player.setCycleCount(MediaPlayer.INDEFINITE);
+            player.setAutoPlay(true);
+            player.setMute(true);
+            MediaView mediaView = new MediaView(player);
+            mediaView.fitWidthProperty().bind(this.rootLayer.widthProperty());
+            mediaView.fitHeightProperty().bind(this.rootLayer.heightProperty());
+            mediaView.setPreserveRatio(false);
+
+            // Add Video (Bottom)
+            this.rootLayer.getChildren().add(0, mediaView);
+        } catch (Exception e) { e.printStackTrace(); this.rootLayer.setStyle("-fx-background-color: #202020;"); }
     }
 
+    // --- MOUSE LOGIC ---
     public void handleMouseClick(int squareId) {
         boardPanel.drawBoard(this.chessBoard);
 
         if (sourceSquare != null) {
+            SoundManager.playClick();
             destinationSquare = chessBoard.getSquare(squareId);
+
             final Move move = findLegalMove(sourceSquare.getSquareCoordinate(), destinationSquare.getSquareCoordinate());
 
             if (move != null) {
@@ -210,6 +253,9 @@ public class GameEngine {
             if (clickedSquare.isOccupied()) {
                 Piece piece = clickedSquare.getPiece();
                 if (piece.getPieceAlliance() == chessBoard.getCurrentPlayer().getAlliance()) {
+                    // Play Click Sound on Select
+                    SoundManager.playClick();
+
                     sourceSquare = clickedSquare;
                     humanMovedPiece = piece;
                     boardPanel.highlightSourceSquare(squareId);
