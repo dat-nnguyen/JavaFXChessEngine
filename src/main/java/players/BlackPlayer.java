@@ -58,8 +58,8 @@ public class BlackPlayer extends Player {
                                     this.playerKing,
                                     6,
                                     (Rook) pieceAt7,
-                                    5,
-                                    7
+                                    7,
+                                    5
                             ));
                         }
                     }
@@ -86,8 +86,8 @@ public class BlackPlayer extends Player {
                                     this.playerKing,
                                     2,
                                     (Rook) pieceAt0,
-                                    3,
-                                    0
+                                    0,
+                                    3
                             ));
                         }
                     }

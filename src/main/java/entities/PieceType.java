@@ -6,21 +6,41 @@ package entities;
  */
 public enum PieceType {
 
-    PAWN("P", 100),
-    KNIGHT("N", 300),
-    BISHOP("B", 300),
+    PAWN("P", 100) {
+        @Override
+        public boolean isKing() { return false; }
+        @Override
+        public boolean isRook() { return false; }
+    },
+    KNIGHT("N", 300) {
+        @Override
+        public boolean isKing() { return false; }
+        @Override
+        public boolean isRook() { return false; }
+    },
+    BISHOP("B", 300) {
+        @Override
+        public boolean isKing() { return false; }
+        @Override
+        public boolean isRook() { return false; }
+    },
     ROOK("R", 500) {
         @Override
-        public boolean isRook() {
-            return true;
-        }
-    },
-    QUEEN("Q", 900),
-    KING("K", 1000) {
+        public boolean isKing() { return false; }
         @Override
-        public boolean isKing() {
-            return true;
-        }
+        public boolean isRook() { return true; }
+    },
+    QUEEN("Q", 900) {
+        @Override
+        public boolean isKing() { return false; }
+        @Override
+        public boolean isRook() { return false; }
+    },
+    KING("K", 10000) {
+        @Override
+        public boolean isKing() { return true; }
+        @Override
+        public boolean isRook() { return false; }
     };
 
     private final String pieceName;
@@ -56,21 +76,9 @@ public enum PieceType {
         return this.pieceValue;
     }
 
-    /**
-     * Returns true if this piece type is a king.
-     *
-     * @return true if king, false otherwise
-     */
-    public boolean isKing() {
-        return false;
-    }
+    // Abstract methods to enforce implementation (optional but good for safety)
+    // Or use default "false" implementation
 
-    /**
-     * Returns true if this piece type is a rook.
-     *
-     * @return true if rook, false otherwise
-     */
-    public boolean isRook() {
-        return false;
-    }
+    public abstract boolean isKing();
+    public abstract boolean isRook();
 }

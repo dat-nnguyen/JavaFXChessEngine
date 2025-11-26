@@ -54,7 +54,7 @@ public class WhitePlayer extends Player {
                     if (this.board.getSquare(63).isOccupied()) {
                         final Piece pieceAt63 = this.board.getSquare(63).getPiece();
                             if (pieceAt63.isFirstMove() && pieceAt63.getPieceType().isRook()) {
-                                kingCastles.add(new KingSideCastleMove(this.board, this.playerKing, 62, (Rook)pieceAt63, 61, 63));
+                                kingCastles.add(new KingSideCastleMove(this.board, this.playerKing, 62, (Rook)pieceAt63, 63, 61));
                         }
                     }
                 }
@@ -77,7 +77,7 @@ public class WhitePlayer extends Player {
                         // TODO: Uncomment once Rook class is created
                             final Piece pieceAt56 = this.board.getSquare(56).getPiece();
                                 if (pieceAt56.isFirstMove() && pieceAt56.getPieceType().isRook()) {
-                                    kingCastles.add(new QueenSideCastleMove(this.board, this.playerKing, 58, (Rook)pieceAt56, 59, 56));
+                                    kingCastles.add(new QueenSideCastleMove(this.board, this.playerKing, 58, (Rook)pieceAt56, 56, 59));
                         }
                     }
                 }
