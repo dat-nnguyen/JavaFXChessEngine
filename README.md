@@ -2,10 +2,10 @@
 
 A fully functional, object-oriented Chess Engine built from scratch using Java 17 and JavaFX. This project features a robust MVC architecture, a custom Minimax AI opponent, and a polished medieval pixel-art interface
 
-![Screenshot 2025-11-26 at 14.50.36.png](../../Desktop/Screenshot%202025-11-26%20at%2014.50.36.png)
-![Screenshot 2025-11-26 at 14.50.50.png](../../Desktop/Screenshot%202025-11-26%20at%2014.50.50.png)
-![Screenshot 2025-11-26 at 14.51.01.png](../../Desktop/Screenshot%202025-11-26%20at%2014.51.01.png)
-![Screenshot 2025-11-26 at 14.51.18.png](../../Desktop/Screenshot%202025-11-26%20at%2014.51.18.png)
+<img width="900" height="694" alt="Image" src="https://github.com/user-attachments/assets/4ab80409-433f-4b13-8c00-faf4374d3396" />
+<img width="897" height="699" alt="Image" src="https://github.com/user-attachments/assets/e9a8aa5d-dce5-4651-b152-faf00fa7f040" />
+<img width="897" height="698" alt="Image" src="https://github.com/user-attachments/assets/dc1e461f-e2bb-47d4-9c72-19b7d2403d68" />
+<img width="896" height="705" alt="Image" src="https://github.com/user-attachments/assets/58942dce-39c9-45d4-87e6-45e23b5ce981" />
 
 ## 🚀 Features
 
